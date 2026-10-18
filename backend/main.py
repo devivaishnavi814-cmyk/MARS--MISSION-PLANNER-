@@ -55,3 +55,44 @@ def a_star(start, end, grid):
                 )
 
     return None
+
+DEFAULT_GRID = [
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 1, 1, 1, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+    [0, 1, 1, 0, 1, 1, 1, 0, 1, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+]
+
+
+class RouteRequest(BaseModel):
+    start: tuple[int, int]
+    end: tuple[int, int]
+    grid: Optional[list[list[int]]] = None
+
+
+app = FastAPI(title="Mars Mission Planner API")
+
+
+@app.post("/calculate-route")
+def calculate_route(req: RouteRequest):
+    grid = req.grid if req.grid is not None else DEFAULT_GRID
+
+    try:
+        path = a_star(req.start, req.end, grid)
+    except ValueError as err:
+        raise HTTPException(status_code=400, detail=str(err))
+
+    if path is None:
+        return {"found": False, "path": [], "steps": 0}
+
+    return {
+        "found": True,
+        "path": [list(p) for p in path],
+        "steps": len(path) - 1,
+    }
