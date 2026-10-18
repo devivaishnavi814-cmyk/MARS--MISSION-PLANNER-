@@ -1,1 +1,3 @@
-Code will be added by Coder 
+fastapi
+uvicorn
+pip install -r requirements.txt
