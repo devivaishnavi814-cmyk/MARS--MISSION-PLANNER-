@@ -32,7 +32,8 @@ def download(url, dest):
     part = dest.with_suffix(".part")
     print("downloading about 2 GB, this takes a few minutes...")
     done, total, next_report = 0, 0, 0
-    with urllib.request.urlopen(url) as resp, open(part, "wb") as out:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (mars-mission-planner)"})
+    with urllib.request.urlopen(req) as resp, open(part, "wb") as out:
         total = int(resp.headers.get("Content-Length", 0))
         while True:
             chunk = resp.read(8 * 1024 * 1024)
